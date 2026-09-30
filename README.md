@@ -18,23 +18,17 @@ Este repositório reúne os projetos, exercícios práticos e atividades desenvo
 ## 📂 Estrutura do Repositório
 
 ```text
-├── 📁 PSOF-PetShop/      # Algoritmos e lógica inicial
+├── 📁 PSOF-PetShop/      # Projeto Academico - PetShop
 ```
 
 ---
 
 ## 🚀 Projetos em Destaque
 
-### 1. [Nome do Projeto 1](./UC2-Desenvolvimento-Web)
-* **Descrição:** Breve explicação sobre o que o projeto faz e qual problema ele resolve.
-* **Competências praticadas:** Manipulação do DOM, responsividade, integração com APIs.
-* **Tecnologias:** HTML, CSS, JavaScript.
-
-### 2. [Nome do Projeto 2](./UC3-Banco-de-Dados)
-* **Descrição:** Descrição resumida do projeto.
-* **Competências praticadas:** Modelagem relacional, consultas SQL, rotas CRUD.
-* **Tecnologias:** Node.js, Express, MySQL.
-
+### 1. PSOF-PetShop
+* **Descrição:** Aplicação web para gerenciamento e agendamento de serviços de pet shop, facilitando a navegação de tutores por serviços e banho/tosa, além de otimizar a organização de atendimentos.
+* **Competências praticadas:** Manipulação do DOM, design responsivo, gerenciamento de estado simples e integração com APIs para simulação de agendamentos.
+* **Tecnologias: HTML, CSS, JavaScript.**
 ---
 
 ## 🔧 Como Executar os Projetos
