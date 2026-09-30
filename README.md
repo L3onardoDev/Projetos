@@ -55,5 +55,5 @@ Este repositório está sob a licença [MIT](./LICENSE) — sinta-se à vontade 
 ---
 
 <div align="center">
-  <sub>Desenvolvido com dedicação por <strong>Seu Nome</strong> durante as aulas no SENAI.</sub>
+  <sub>Desenvolvido com dedicação por <strong>Leonardo Barbosa</strong> durante as aulas no SENAI.</sub>
 </div>
