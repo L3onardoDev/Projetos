@@ -19,10 +19,7 @@ Este repositório reúne os projetos, exercícios práticos e atividades desenvo
 
 ```text
 .
-├── 📁 UC1-Logica-de-Programacao/      # Algoritmos e lógica inicial
-├── 📁 UC2-Desenvolvimento-Web/         # Landing pages e aplicações front-end
-├── 📁 UC3-Banco-de-Dados/             # Modelagem e scripts SQL
-└── 📁 UC4-Projeto-Integrador/          # Projeto final da unidade/curso
+├── 📁 PSOF-PetShop/      # Algoritmos e lógica inicial
 ```
 
 ---
