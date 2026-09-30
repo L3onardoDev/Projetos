@@ -1,0 +1,28 @@
+--------------------------------------------------------------------------------
+------------------------------- Problema ---------------------------------------
+--------------------------------------------------------------------------------
+
+Dificuldade de localização de informações:
+Tutores de animais de estimação frequentemente têm dificuldades para encontrar, em um só lugar, horários de funcionamento, tabela de serviços e canais de atendimento do estabelecimento.
+
+Falta de clareza sobre os serviços oferecidos:
+Dúvidas frequentes de clientes sobre quais procedimentos são realizados (como banho, tosa, consultas veterinárias e vacinação) e quais os diferenciais do atendimento.
+
+Ausência de um canal digital prático:
+Dificuldade para o cliente consultar produtos disponíveis (rações, acessórios) e obter orientações de contato de forma rápida.
+
+--------------------------------------------------------------------------------
+------------------------------- Objetivo ---------------------------------------
+--------------------------------------------------------------------------------
+
+Apresentar o PetShop de forma profissional, clara e acessível, centralizando as informações sobre a empresa, a equipe, a localização e a lista de serviços prestados.
+
+Facilitar o contato e o atendimento ao cliente, oferecendo um caminho simples para tirar dúvidas, verificar horários e encaminhar solicitações de agendamento.
+
+--------------------------------------------------------------------------------
+------------------------------- Público-Alvo -----------------------------------
+--------------------------------------------------------------------------------
+
+Tutores de animais de estimação (cães, gatos, entre outros) residentes na região local que procuram serviços de higiene, saúde, estética animal e compra de suprimentos.
+
+Pessoas que buscam conveniência e agilidade para consultar informações do petshop diretamente pelo celular ou computador antes de realizar uma visita ou agendamento.
