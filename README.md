@@ -18,7 +18,6 @@ Este repositório reúne os projetos, exercícios práticos e atividades desenvo
 ## 📂 Estrutura do Repositório
 
 ```text
-.
 ├── 📁 PSOF-PetShop/      # Algoritmos e lógica inicial
 ```
 
