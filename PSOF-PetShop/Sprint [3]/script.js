@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (redirect) setTimeout(() => { window.location.href = redirect; }, 700);
     } else {
       feedback.className = 'feedback erro';
-      feedback.textContent = 'Cadastro não encontrado ou senha incorreta. Use a tela de cadastro para criar uma conta fictícia.';
+      feedback.textContent = 'Cadastro não encontrado ou senha incorreta. Use a tela de cadastro para criar uma conta.';
     }
     feedback.hidden = false;
   });
