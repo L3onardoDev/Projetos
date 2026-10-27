@@ -11,12 +11,12 @@
 
   <header>
     <a href="Pagina_Inicial.html"><img src="Assets/logo.png" alt="Logo PetLife"></a>
-    <input type="search" placeholder="Barra de pesquisa">
-    <nav>
+    <input type="search" placeholder="Buscar no site" aria-label="Buscar no site">
+    <nav aria-label="Navegação principal">
       <a href="Catálogo_Produtos.html">Catálogo</a>
       <a href="Servicos.html">Serviços</a>
       <a href="Suporte-Atendimento.html">Suporte</a>
-    </nav>
+    <a href="Login.html">Minha conta</a><a href="Carrinho.html">Carrinho (<span data-cart-count>0</span>)</a></nav>
   </header>
 
   <main>
@@ -27,12 +27,12 @@
 
     <!-- Textos de exemplo: troquem pelas respostas reais do projeto -->
     <section class="lista">
-      <section class="card">
+      <section class="card" id="entrega">
         <h3>Como acompanho minha entrega?</h3>
         <p>Na página de Suporte e Atendimento você encontra o acesso rápido para acompanhar sua entrega.</p>
       </section>
 
-      <section class="card">
+      <section class="card" id="trocas">
         <h3>Como faço uma devolução ou troca?</h3>
         <p>Fale com a nossa central pelo telefone (19) 99999-8888 ou veja as opções na página de Suporte e Atendimento.</p>
       </section>
@@ -61,5 +61,6 @@
     </nav>
   </footer>
 
+  <script src="script.js" defer></script>
 </body>
 </html>

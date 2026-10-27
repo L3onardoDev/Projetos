@@ -11,12 +11,12 @@
 
   <header>
     <a href="Pagina_Inicial.html"><img src="Assets/logo.png" alt="Logo PetLife"></a>
-    <input type="search" placeholder="Barra de pesquisa">
-    <nav>
+    <input type="search" placeholder="Buscar no site" aria-label="Buscar no site">
+    <nav aria-label="Navegação principal">
       <a href="Catálogo_Produtos.html">Catálogo</a>
       <a href="Servicos.html">Serviços</a>
       <a href="Suporte-Atendimento.html">Suporte</a>
-    </nav>
+    <a href="Login.html">Minha conta</a><a href="Carrinho.html">Carrinho (<span data-cart-count>0</span>)</a></nav>
   </header>
 
   <main>
@@ -28,51 +28,51 @@
     </section>
 
     <section class="lista">
-      <section class="card">
+      <section class="card" data-product-card data-name="Peitoral PetLife para Cães" data-price="69.99">
         <img src="Assets/Itens/antiestressantes.jpg" alt="Antiestressantes">
         <h3>Antiestressantes</h3>
         <p>Seu pet tranquilo em situações que fogem da rotina</p>
-        <a href="">Comprar Agora</a>
+        <a href="Catálogo_Produtos.html">Comprar agora</a>
       </section>
-      <section class="card">
+      <section class="card" data-product-card data-name="Brinquedo PetLife para Cães" data-price="34.99">
         <img src="Assets/Itens/racoes.png" alt="Rações">
         <h3>Rações</h3>
         <p>Para alimentar seu pet com saúde</p>
-        <a href="">Comprar Agora</a>
+        <a href="Catálogo_Produtos.html">Comprar agora</a>
       </section>
-      <section class="card">
+      <section class="card" data-product-card data-name="Cama Suspensa PetLife para Cães" data-price="314.99">
         <img src="Assets/Itens/antipulga.png" alt="Antipulgas">
         <h3>Antipulgas</h3>
         <p>Proteja seu pet contra pulgas</p>
-        <a href="">Comprar Agora</a>
+        <a href="Catálogo_Produtos.html">Comprar agora</a>
       </section>
     </section>
 
     <section class="lista">
       <h2>Promoções Do Dia</h2>
-      <section class="card">
+      <section class="card" data-product-card data-name="Cochonete PetLife para Cães" data-price="249.99">
         <img src="Assets/Itens/peitoral.png" alt="Peitoral">
         <h3>Peitoral PetLife para Cães</h3>
         <p>R$ 69,99</p>
-        <button>+</button>
+        <button type="button" data-product="produto">Comprar</button>
       </section>
-      <section class="card">
+      <section class="card" data-product-card data-name="Peitoral PetLife para Cães" data-price="69.99">
         <img src="Assets/Itens/brinquedo.png" alt="Brinquedo">
         <h3>Brinquedo PetLife para Cães</h3>
         <p>R$ 34,99</p>
-        <button>+</button>
+        <button type="button" data-product="produto">Comprar</button>
       </section>
-      <section class="card">
+      <section class="card" data-product-card data-name="Brinquedo PetLife para Cães" data-price="34.99">
         <img src="Assets/Itens/cama-suspensa.png" alt="Cama Suspensa">
         <h3>Cama Suspensa PetLife para Cães</h3>
         <p>R$ 314,99</p>
-        <button>+</button>
+        <button type="button" data-product="produto">Comprar</button>
       </section>
-      <section class="card">
+      <section class="card" data-product-card data-name="Cama Suspensa PetLife para Cães" data-price="314.99">
         <img src="Assets/Itens/cochonete.png" alt="Cochonete">
         <h3>Cochonete PetLife para Cães</h3>
         <p>R$ 249,99</p>
-        <button>+</button>
+        <button type="button" data-product="produto">Comprar</button>
       </section>
       <button>&gt;</button>
     </section>
@@ -84,14 +84,14 @@
         <h3>Descubra 6 cheiros de que os gatos não gostam</h3>
         <p>Você sabe quais cheiros os gatos não gostam de sentir? Descubra...</p>
         <p>06/10/26 | 2min de leitura</p>
-        <a href="">Ler mais →</a>
+        <a href="Perguntas_Frequentes.html">Ler mais →</a>
       </article>
       <article class="card">
         <img src="Assets/cachorro-blog.png" alt="Cachorro">
         <h3>Nomes para cachorro: escolha o que mais combina com seu peludo!</h3>
         <p>Escolher nomes para cachorros pode ser uma tarefa difícil, pois...</p>
         <p>06/10/26 | 5min de leitura</p>
-        <a href="">Ler mais →</a>
+        <a href="Perguntas_Frequentes.html">Ler mais →</a>
       </article>
     </section>
 
@@ -108,5 +108,6 @@
     </nav>
   </footer>
 
+  <script src="script.js" defer></script>
 </body>
 </html>

@@ -11,12 +11,12 @@
 
   <header>
     <a href="Pagina_Inicial.html"><img src="Assets/logo.png" alt="Logo PetLife"></a>
-    <input type="search" placeholder="Barra de pesquisa">
-    <nav>
+    <input type="search" placeholder="Buscar no site" aria-label="Buscar no site">
+    <nav aria-label="Navegação principal">
       <a href="Catálogo_Produtos.html">Catálogo</a>
       <a href="Servicos.html">Serviços</a>
       <a href="Suporte-Atendimento.html">Suporte</a>
-    </nav>
+    <a href="Login.html">Minha conta</a><a href="Carrinho.html">Carrinho (<span data-cart-count>0</span>)</a></nav>
   </header>
 
   <main>
@@ -26,30 +26,42 @@
       <h2>Olá, aqui você tem acesso rápido para:</h2>
     </section>
 
+    <!-- Textos de exemplo: troquem pelas informações reais do projeto -->
     <section class="lista">
       <section class="card">
         <h3>Devolução</h3>
+        <p>Saiba como devolver um produto comprado.</p>
+        <button type="button" data-help>Ver detalhes</button><p class="help-answer" hidden>Entre em contato com nossa central para receber orientações personalizadas.</p>
       </section>
 
       <section class="card">
         <h3>Acompanhe sua entrega</h3>
+        <p>Veja onde está o seu pedido.</p>
+        <button type="button" data-help>Ver detalhes</button><p class="help-answer" hidden>Entre em contato com nossa central para receber orientações personalizadas.</p>
       </section>
 
       <section class="card">
         <h3>Troque sua compra na loja</h3>
+        <p>Leve o produto até uma de nossas lojas.</p>
+        <button type="button" data-help>Ver detalhes</button><p class="help-answer" hidden>Entre em contato com nossa central para receber orientações personalizadas.</p>
       </section>
 
       <section class="card">
         <h3>Serviços para seu pet</h3>
+        <p>Banho, creche, hospedagem e muito mais.</p>
+        <a href="Servicos.html">Ver serviços</a>
       </section>
 
       <section class="card">
         <h3>Horários de funcionamento</h3>
+        <p>Confira quando nossas lojas estão abertas.</p>
+        <button type="button" data-help>Ver detalhes</button><p class="help-answer" hidden>Entre em contato com nossa central para receber orientações personalizadas.</p>
       </section>
 
       <section class="card">
         <h3>Central para nosso cliente</h3>
-        <p>(19) 99999-8888</p>
+        <p>Fale com a gente pelo telefone:</p>
+        <p><strong>(19) 99999-8888</strong></p>
       </section>
     </section>
 
@@ -66,5 +78,6 @@
     </nav>
   </footer>
 
+  <script src="script.js" defer></script>
 </body>
 </html>
