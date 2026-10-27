@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const accountKey = 'petlife-account';
   const sessionKey = 'petlife-session';
   const pendingProductKey = 'petlife-pending-product';
+  const authKey = 'petlife-auth';
   const getCart = () => JSON.parse(localStorage.getItem(cartKey) || '[]');
   const saveCart = (cart) => localStorage.setItem(cartKey, JSON.stringify(cart));
   const money = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -157,42 +158,69 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Checkout fictício: não há pagamento ou pedido real.
   const checkoutForm = document.querySelector('[data-checkout-form]');
-  checkoutForm?.addEventListener('submit', (event) => {
+  checkoutForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!isLoggedIn()) {
       window.location.href = 'Login.html?redirect=Finalizacao.html';
       return;
     }
     if (!getCart().length) return;
-    const order = `PL-${Date.now().toString().slice(-6)}`;
-    localStorage.setItem('petlife-last-order', order);
-    saveCart([]);
-    document.querySelector('[data-checkout-panel]').hidden = true;
-    document.querySelector('[data-order-success]').hidden = false;
-    document.querySelector('[data-order-number]').textContent = order;
-    updateCartLabel();
+    const formData = Object.fromEntries(new FormData(checkoutForm).entries());
+    const feedback = document.querySelector('[data-checkout-feedback]');
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${JSON.parse(localStorage.getItem(authKey)).token}` },
+        body: JSON.stringify({ ...formData, items: getCart() })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Não foi possível criar o pedido.');
+      saveCart([]);
+      document.querySelector('[data-checkout-panel]').hidden = true;
+      document.querySelector('[data-order-success]').hidden = false;
+      document.querySelector('[data-order-number]').textContent = result.order;
+      updateCartLabel();
+    } catch (error) {
+      feedback.textContent = error.message;
+      feedback.hidden = false;
+    }
   });
 
   // Cadastro fictício do tutor e do pet.
   const petForm = document.querySelector('[data-pet-form]');
-  petForm?.addEventListener('submit', (event) => {
+  petForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(petForm).entries());
-    localStorage.setItem(accountKey, JSON.stringify(data));
-    localStorage.removeItem(sessionKey);
-    petForm.reset();
-    document.querySelector('[data-pet-success]').hidden = false;
+    const feedback = document.querySelector('[data-pet-success]');
+    try {
+      const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Não foi possível criar o cadastro.');
+      localStorage.setItem(accountKey, JSON.stringify(data));
+      localStorage.removeItem(sessionKey);
+      petForm.reset();
+      feedback.className = 'feedback sucesso';
+      feedback.textContent = result.message;
+      feedback.hidden = false;
+    } catch (error) {
+      feedback.className = 'feedback erro';
+      feedback.textContent = error.message;
+      feedback.hidden = false;
+    }
   });
 
   // Login fictício contra o cadastro salvo neste navegador.
   const loginForm = document.querySelector('[data-login-form]');
-  loginForm?.addEventListener('submit', (event) => {
+  loginForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const account = JSON.parse(localStorage.getItem(accountKey) || 'null');
     const data = Object.fromEntries(new FormData(loginForm).entries());
     const feedback = document.querySelector('[data-login-feedback]');
-    if (account && account.email === data.email && account.password === data.password) {
+    try {
+      const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'E-mail ou senha inválidos.');
       localStorage.setItem(sessionKey, 'true');
+      localStorage.setItem(authKey, JSON.stringify(result));
       const pendingProduct = JSON.parse(localStorage.getItem(pendingProductKey) || 'null');
       if (pendingProduct) {
         const cart = getCart();
@@ -203,14 +231,26 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem(pendingProductKey);
       }
       feedback.className = 'feedback sucesso';
-      feedback.textContent = `Login realizado. Olá, ${account.ownerName}!`;
+      feedback.textContent = `Login realizado. Olá, ${result.user.ownerName}!`;
       const redirect = new URLSearchParams(window.location.search).get('redirect');
       if (redirect) setTimeout(() => { window.location.href = redirect; }, 700);
-    } else {
+    } catch (error) {
       feedback.className = 'feedback erro';
-      feedback.textContent = 'Cadastro não encontrado ou senha incorreta. Use a tela de cadastro para criar uma conta.';
+      feedback.textContent = error.message;
+      feedback.hidden = false;
     }
+  });
+
+  const bookingForm = document.querySelector('[data-booking-form]');
+  bookingForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(bookingForm).entries());
+    const protocol = `AT-${Date.now().toString().slice(-6)}`;
+    localStorage.setItem('petlife-booking', JSON.stringify({ ...data, protocol }));
+    const feedback = document.querySelector('[data-booking-success]');
+    feedback.textContent = `Solicitação recebida! Protocolo ${protocol}. Nossa equipe confirmará o horário para ${data.pet}.`;
     feedback.hidden = false;
+    bookingForm.reset();
   });
 
   updateCartLabel();

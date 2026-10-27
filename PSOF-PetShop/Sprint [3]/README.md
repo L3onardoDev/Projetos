@@ -17,3 +17,9 @@ A compra exige autenticação: ao clicar em Comprar sem login, o usuário é env
 Para este protótipo, **não é necessário banco de dados**. O carrinho, o cadastro e o login são apenas demonstrações locais.
 
 Um banco será necessário se o projeto evoluir para uma aplicação real com usuários persistentes, pedidos, estoque, pagamentos, produtos gerenciados por painel administrativo, blog editável ou armazenamento permanente de formulários.
+
+## Banco de dados local
+
+O arquivo `server.py` cria automaticamente o banco `petlife.db` usando SQLite. Ele cria as tabelas `users`, `pets`, `products`, `orders` e `order_items`, além de inserir os produtos iniciais.
+
+Para executar o projeto com o banco ativo, use `python3 server.py` dentro desta pasta e abra `http://localhost:4173`. O cadastro, login e checkout passam a usar as rotas `/api/register`, `/api/login` e `/api/orders`.
