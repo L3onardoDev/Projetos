@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
   const cartKey = 'petlife-cart';
-  const accountKey = 'petlife-account';
   const sessionKey = 'petlife-session';
   const pendingProductKey = 'petlife-pending-product';
   const authKey = 'petlife-auth';
@@ -156,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   renderCart();
 
-  // Checkout fictício: não há pagamento ou pedido real.
+  // O pedido é gravado no backend; pagamento online requer integração.
   const checkoutForm = document.querySelector('[data-checkout-form]');
   checkoutForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -186,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Cadastro fictício do tutor e do pet.
+  // Cadastro do tutor e do pet.
   const petForm = document.querySelector('[data-pet-form]');
   petForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -196,7 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Não foi possível criar o cadastro.');
-      localStorage.setItem(accountKey, JSON.stringify(data));
       localStorage.removeItem(sessionKey);
       petForm.reset();
       feedback.className = 'feedback sucesso';
@@ -209,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Login fictício contra o cadastro salvo neste navegador.
+  // Login verificado pelo backend e pelo banco de dados.
   const loginForm = document.querySelector('[data-login-form]');
   loginForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -242,15 +240,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const bookingForm = document.querySelector('[data-booking-form]');
-  bookingForm?.addEventListener('submit', (event) => {
+  bookingForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(bookingForm).entries());
-    const protocol = `AT-${Date.now().toString().slice(-6)}`;
-    localStorage.setItem('petlife-booking', JSON.stringify({ ...data, protocol }));
     const feedback = document.querySelector('[data-booking-success]');
-    feedback.textContent = `Solicitação recebida! Protocolo ${protocol}. Nossa equipe confirmará o horário para ${data.pet}.`;
-    feedback.hidden = false;
-    bookingForm.reset();
+    try {
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Não foi possível solicitar o agendamento.');
+      feedback.className = 'feedback sucesso';
+      feedback.textContent = result.message;
+      feedback.hidden = false;
+      bookingForm.reset();
+    } catch (error) {
+      feedback.className = 'feedback erro';
+      feedback.textContent = error.message;
+      feedback.hidden = false;
+    }
   });
 
   updateCartLabel();
