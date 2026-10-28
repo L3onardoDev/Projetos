@@ -19,6 +19,7 @@ body {
   background-color: #F6EFDF;
   color: #2B2B2B;
   line-height: 1.5;
+  overflow-x: hidden;
   /* Mantém o rodapé no fim da tela mesmo em páginas curtas */
   min-height: 100vh;
   display: flex;
@@ -324,7 +325,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   main h1 { font-size: clamp(1.6rem, 7vw, 2.2rem); }
   main h2 { font-size: 1.35rem; }
   .banner { gap: 5px; }
-  .banner img { min-height: 120px; object-fit: cover; }
+  .banner img { width: 100%; height: auto; min-height: 0; object-fit: contain; }
   .banner button { min-width: 44px; padding: 8px; }
   .lista { gap: 14px; }
   .lista > .card { flex: 1 1 calc(50% - 14px); min-width: 0; }
@@ -342,9 +343,10 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
   footer nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
   body > header nav a,
   footer nav a { min-height: 42px; display: grid; place-items: center; text-align: center; }
+  body > header nav a { white-space: nowrap; font-size: clamp(.78rem, 3.7vw, 1rem); padding-left: 3px; padding-right: 3px; }
   .lista > .card { flex-basis: 100%; }
   .card img { height: 180px; }
-  .banner img { min-height: 100px; }
+  .banner img { min-height: 0; height: auto; }
   .form-card { margin-bottom: 20px; }
   .form-card button,
   .checkout-button,
