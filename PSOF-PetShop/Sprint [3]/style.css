@@ -111,11 +111,13 @@ nav {
 nav a {
   padding: 6px 12px;
   border-radius: 6px;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease;
 }
 
 nav a:hover {
   background-color: #CFE8C8;
   color: #1F4D36;
+  transform: translateY(-2px);
 }
 
 input {
@@ -123,6 +125,11 @@ input {
   padding: 8px 14px;
   border: 2px solid #CFE8C8;
   border-radius: 20px;
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+input:hover {
+  border-color: #E07A00;
 }
 
 /* ---------- Botões ---------- */
@@ -136,11 +143,14 @@ button,
   color: #FFFFFF;
   font-weight: bold;
   cursor: pointer;
+  transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
 }
 
 button:hover,
 .card a:hover {
   background-color: #8F4600;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 12px rgba(31, 77, 54, .18);
 }
 
 /* ---------- Cards ---------- */
@@ -312,12 +322,20 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .checkout-button.desabilitado { opacity: .5; pointer-events: none; }
 .link-secundario, .form-footnote a { color: #1F4D36; text-decoration: underline; font-weight: bold; }
 .form-card { max-width: 760px; margin: 0 auto 30px; padding: 24px; background: #fff; border: 1px solid #CFE8C8; border-top: 4px solid #E07A00; border-radius: 8px; }
+.form-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.form-card:hover { transform: translateY(-4px); border-color: #E07A00; box-shadow: 0 12px 24px rgba(31, 77, 54, .14); }
 .form-card form { display: grid; gap: 16px; }
 .form-card h2 { margin: 6px 0 0; }
 .form-card label { display: grid; gap: 6px; font-weight: bold; color: #1F4D36; }
 .form-card input, .form-card select { width: 100%; flex: initial; border-radius: 6px; padding: 10px 12px; background: #fff; color: #2B2B2B; }
+.form-card input:hover, .form-card select:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(224, 122, 0, .12); }
+.form-card input:focus, .form-card select:focus { border-color: #E07A00; box-shadow: 0 0 0 3px rgba(224, 122, 0, .18); transform: translateY(-1px); }
+.form-card button { transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease; }
+.form-card button:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 6px 14px rgba(184, 92, 0, .28); }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-footnote { margin-top: 18px; text-align: center; }
+.form-footnote a { transition: color .2s ease, letter-spacing .2s ease; }
+.form-footnote a:hover { color: #B85C00; letter-spacing: .2px; }
 .feedback { padding: 10px; border-radius: 6px; margin: 0; }
 .feedback.sucesso { background: #d9f1d5; color: #1F4D36; }
 .feedback.erro { background: #f8d7da; color: #842029; }
@@ -327,6 +345,15 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .agendamento-card h2 { margin-top: 0; }
 .agendamento-card textarea { width: 100%; resize: vertical; border: 1px solid #CFE8C8; border-radius: 6px; padding: 10px 12px; font: inherit; }
 @media (max-width: 760px) { .cart-layout, .form-grid { grid-template-columns: 1fr; } .cart-summary { position: static; } .cart-item { align-items: flex-start; flex-direction: column; } .cart-actions { justify-content: start; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
 
 /* ---------- Guia de estilos ---------- */
 .style-guide { max-width: 1100px; }
