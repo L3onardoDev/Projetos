@@ -163,7 +163,7 @@ class Handler(BaseHTTPRequestHandler):
             with db() as connection:
                 rows = connection.execute('SELECT id, name, price, stock FROM products ORDER BY id').fetchall()
             return json_response(self, 200, {'products': [dict(row) for row in rows]})
-        relative = 'Pagina_Inicial.html' if path == '/' else path.lstrip('/')
+        relative = 'index.html' if path == '/' else path.lstrip('/')
         file_path = (ROOT / relative).resolve()
         if ROOT.resolve() not in file_path.parents or not file_path.is_file():
             return json_response(self, 404, {'error': 'Página não encontrada.'})
