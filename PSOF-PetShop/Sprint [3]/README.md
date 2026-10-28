@@ -96,3 +96,4 @@ Sprint [3]/
 ## Publicação
 
 O servidor está configurado para escutar em todas as interfaces de rede na porta `4173`. Para disponibilizá-lo fora do ambiente local, configure uma hospedagem apropriada, HTTPS, armazenamento persistente e backups. Avalie também os requisitos de privacidade, retenção e proteção dos dados pessoais antes de usar informações reais.
+<!-- d -->
