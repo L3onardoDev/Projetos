@@ -439,3 +439,63 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .feedback { margin-bottom: 12px; }
 .focus-demo { padding: 12px; background: #FFFFFF; border-radius: 6px; }
 @media (max-width: 640px) { .brand-preview, .cart-item-demo { align-items: flex-start; flex-direction: column; } }
+
+/* ---------- Ajuste final para navegação em celulares ---------- */
+@media (max-width: 640px) {
+  body > header {
+    align-items: center;
+    overflow: hidden;
+  }
+
+  body > header nav {
+    display: flex;
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 2px 2px 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  body > header nav a {
+    flex: 0 0 auto;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: .95rem;
+    padding: 8px 12px;
+  }
+
+  body > header input {
+    order: 3;
+    flex: 1 1 100%;
+    min-height: 44px;
+    width: 100%;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  body > header nav {
+    display: flex;
+    grid-template-columns: none;
+  }
+
+  body > header nav a {
+    min-height: 44px;
+    font-size: .9rem;
+    padding: 8px 11px;
+  }
+
+  footer nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
