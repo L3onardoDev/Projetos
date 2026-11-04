@@ -3,14 +3,35 @@
 import hashlib
 import json
 import mimetypes
+import os
 import secrets
 import sqlite3
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
+
+
+def load_env_file():
+    """Carrega variáveis simples do arquivo .env, sem sobrescrever o ambiente."""
+    env_path = ROOT / '.env'
+    if not env_path.exists():
+        return
+    for raw_line in env_path.read_text(encoding='utf-8').splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        key, value = line.split('=', 1)
+        key, value = key.strip(), value.strip().strip('"').strip("'")
+        if key:
+            os.environ.setdefault(key, value)
+
+
+load_env_file()
 DB_PATH = ROOT / 'petlife.db'
 HOST = '0.0.0.0'
 PORT = 4173
@@ -270,6 +291,55 @@ class Handler(BaseHTTPRequestHandler):
                 with db() as connection:
                     connection.execute('INSERT INTO bookings (protocol,tutor,pet,date,time,service,notes) VALUES (?,?,?,?,?,?,?)', (protocol, fields['tutor'], fields['pet'], fields['date'], fields['time'], fields['service'], fields['notes']))
                 return json_response(self, 201, {'ok': True, 'protocol': protocol, 'message': f"Solicitação recebida! Protocolo {protocol}. Nossa equipe confirmará o horário para {fields['pet']}."})
+
+            if path == '/api/chat':
+                message = clean_text(data.get('message'), 1200)
+                history = data.get('history', [])
+                if not message:
+                    return json_response(self, 400, {'error': 'Digite uma mensagem para iniciar a conversa.'})
+                if not isinstance(history, list):
+                    history = []
+                api_key = os.environ.get('XAI_API_KEY', os.environ.get('OPENAI_API_KEY', '')).strip()
+                if not api_key:
+                    return json_response(self, 503, {'error': 'O chatbot ainda não está configurado. Defina XAI_API_KEY no servidor.'})
+                api_base = os.environ.get('XAI_API_BASE', os.environ.get('OPENAI_API_BASE', 'https://api.x.ai/v1')).rstrip('/')
+                messages = [{'role': 'system', 'content': 'Você é o assistente virtual da PetLife, uma loja e centro de cuidados para cães e gatos. Responda em português do Brasil, com clareza e cordialidade. Ajude com produtos, pedidos, entrega, banho e tosa, agendamentos, cadastro e dúvidas gerais. Não invente preços, prazos, políticas ou disponibilidade. Quando não souber, diga que a equipe precisa confirmar. Não peça senhas, dados de cartão ou informações sensíveis.'}]
+                for item in history[-8:]:
+                    if isinstance(item, dict) and item.get('role') in {'user', 'assistant'} and isinstance(item.get('content'), str):
+                        messages.append({'role': item['role'], 'content': item['content'][:1200]})
+                messages.append({'role': 'user', 'content': message})
+                model = os.environ.get('XAI_CHAT_MODEL', os.environ.get('OPENAI_CHAT_MODEL', 'grok-3-mini'))
+                payload = json.dumps({'model': model, 'messages': messages, 'temperature': 0.3, 'max_tokens': 500}).encode('utf-8')
+                request = urllib.request.Request(
+                    f'{api_base}/chat/completions',
+                    data=payload,
+                    headers={
+                        'Authorization': f'Bearer {api_key}',
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'User-Agent': 'PetLife-Chatbot/1.0'
+                    },
+                    method='POST'
+                )
+                try:
+                    with urllib.request.urlopen(request, timeout=35) as response:
+                        result = json.loads(response.read().decode('utf-8'))
+                    answer = result['choices'][0]['message']['content'].strip()
+                    return json_response(self, 200, {'ok': True, 'answer': answer})
+                except urllib.error.HTTPError as error:
+                    provider_body = error.read().decode('utf-8', errors='replace')[:800]
+                    print(f'[chat] provedor retornou HTTP {error.code}: {provider_body}', flush=True)
+                    if error.code == 403 and '1010' in provider_body:
+                        message = 'A Groq bloqueou a conexão (código 1010). Desative VPN/proxy, teste outra rede ou consulte o suporte da Groq.'
+                    else:
+                        message = f'O provedor de IA recusou a chamada (HTTP {error.code}). Veja o terminal do servidor para o motivo.'
+                    return json_response(self, 502, {'error': message})
+                except urllib.error.URLError as error:
+                    print(f'[chat] erro de conexão com o provedor: {error}', flush=True)
+                    return json_response(self, 502, {'error': 'Não foi possível conectar ao provedor de IA. Verifique a internet e tente novamente.'})
+                except (KeyError, IndexError, json.JSONDecodeError, TimeoutError) as error:
+                    print(f'[chat] resposta inválida do provedor: {error}', flush=True)
+                    return json_response(self, 502, {'error': 'O provedor de IA enviou uma resposta inesperada. Veja o terminal do servidor.'})
 
             return json_response(self, 404, {'error': 'Endpoint não encontrado.'})
         except sqlite3.IntegrityError as error:

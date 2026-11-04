@@ -263,5 +263,62 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  document.querySelectorAll('[data-toggle-password]').forEach((toggle) => toggle.addEventListener('click', () => {
+    const input = toggle.parentElement.querySelector('input');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    toggle.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
+  }));
+
+  const chatForm = document.querySelector('[data-chat-form]');
+  const chatMessages = document.querySelector('[data-chat-messages]');
+  const chatEmpty = document.querySelector('[data-chat-empty]');
+  const chatFeedback = document.querySelector('[data-chat-feedback]');
+  const chatHistory = [];
+  const appendMessage = (role, text, loading = false) => {
+    if (chatEmpty) chatEmpty.hidden = true;
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${role}${loading ? ' loading' : ''}`;
+    bubble.textContent = text;
+    chatMessages?.appendChild(bubble);
+    chatMessages?.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+    return bubble;
+  };
+  chatForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const input = chatForm.elements.message;
+    const message = input.value.trim();
+    if (!message) return;
+    input.value = '';
+    chatFeedback.hidden = true;
+    appendMessage('user', message);
+    const loading = appendMessage('assistant', 'Consultando o assistente…', true);
+    chatForm.querySelector('button').disabled = true;
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, history: chatHistory })
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Não foi possível responder agora.');
+      loading.remove();
+      appendMessage('assistant', result.answer);
+      chatHistory.push({ role: 'user', content: message }, { role: 'assistant', content: result.answer });
+    } catch (error) {
+      loading.remove();
+      chatFeedback.textContent = error.message;
+      chatFeedback.hidden = false;
+    }
+    chatForm.querySelector('button').disabled = false;
+    input.focus();
+  });
+  document.querySelector('[data-chat-clear]')?.addEventListener('click', () => {
+    chatMessages.innerHTML = '';
+    chatMessages.appendChild(chatEmpty);
+    chatEmpty.hidden = false;
+    chatHistory.length = 0;
+    chatFeedback.hidden = true;
+  });
+
   updateCartLabel();
 });

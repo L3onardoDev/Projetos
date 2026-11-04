@@ -10,6 +10,7 @@ Site de pet shop com catálogo de produtos, carrinho de compras, cadastro de tut
 - Senhas protegidas com PBKDF2; sessões com validade de sete dias.
 - Pedidos associados à conta do tutor. O servidor consulta os preços do catálogo e calcula o total.
 - Solicitações de banho e tosa com protocolo de atendimento.
+- Suporte centralizado em chatbot com API de IA.
 - Interface adaptada para navegação em dispositivos móveis.
 
 > **Pagamento:** o checkout registra o pedido, mas não processa pagamentos online. Não informe dados reais de pagamento. Uma integração com um provedor de pagamentos deverá ser implementada antes de aceitar cobranças.
@@ -72,8 +73,23 @@ O servidor disponibiliza os seguintes endpoints:
 | `POST` | `/api/login` | Autentica o tutor e cria uma sessão |
 | `POST` | `/api/orders` | Registra um pedido; exige sessão válida |
 | `POST` | `/api/bookings` | Registra uma solicitação de agendamento |
+| `POST` | `/api/chat` | Consulta o assistente Grok; exige `XAI_API_KEY` no servidor |
 
 As operações `POST` recebem dados em JSON.
+
+## Configurar o chatbot
+
+A página `Suporte-Atendimento.html` usa o chat como elemento principal e não expõe a chave de API no navegador. O backend carrega automaticamente um arquivo `.env` colocado na mesma pasta do `server.py`. Para usar o Groq, crie esse arquivo com:
+
+```env
+XAI_API_KEY=sua-chave-groq-aqui
+XAI_CHAT_MODEL=llama-3.1-8b-instant
+XAI_API_BASE=https://api.groq.com/openai/v1
+```
+
+Para continuar usando Grok, use `grok-3-mini` e `https://api.x.ai/v1` no lugar dos valores do Groq. Nunca coloque a chave diretamente em `script.js` ou em um arquivo HTML. O arquivo `.env` não deve ser publicado ou compartilhado.
+
+As telas `Servicos.html`, `Login.html` e `Cadastro_Pet.html` foram reorganizadas com hierarquia visual, cartões mais claros, chamadas de ação, benefícios da conta, etapas de preenchimento, mostrar/ocultar senha e layout responsivo.
 
 ## Banco de dados
 
