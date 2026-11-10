@@ -3,10 +3,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const sessionKey = 'petlife-session';
   const pendingProductKey = 'petlife-pending-product';
   const authKey = 'petlife-auth';
+
+  // Usa o mesmo IP/host do Live Server e a porta do backend Python.
+  // Se o backend estiver em outro computador, substitua pelo IP dele:
+  // const API_URL = 'http://192.168.1.105:4173';
+  const API_URL = `${window.location.protocol}//${window.location.hostname}:4173`;
+
+  const apiFetch = async (path, options = {}) => {
+    const response = await fetch(`${API_URL}${path}`, options);
+    const raw = await response.text();
+
+    let result;
+    try {
+      result = raw ? JSON.parse(raw) : {};
+    } catch {
+      throw new Error(
+        `O servidor retornou uma resposta que não é JSON (HTTP ${response.status}). Verifique o endereço da API e o terminal do Python.`
+      );
+    }
+
+    if (!response.ok) {
+      throw new Error(result.error || `Erro na solicitação (HTTP ${response.status}).`);
+    }
+
+    return result;
+  };
+
   const getCart = () => JSON.parse(localStorage.getItem(cartKey) || '[]');
   const saveCart = (cart) => localStorage.setItem(cartKey, JSON.stringify(cart));
   const money = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
   const isLoggedIn = () => localStorage.getItem(sessionKey) === 'true';
 
   if (window.location.pathname.endsWith('Finalizacao.html') && !isLoggedIn()) {
@@ -16,27 +41,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const updateCartLabel = () => {
     const total = getCart().reduce((sum, item) => sum + item.quantity, 0);
-    document.querySelectorAll('[data-cart-count]').forEach((element) => { element.textContent = total; });
+    document.querySelectorAll('[data-cart-count]').forEach((element) => {
+      element.textContent = total;
+    });
   };
 
   const addToCart = (button) => {
     const product = button.closest('[data-product-card]');
     if (!product) return;
+
     const item = {
       name: product.dataset.name,
       price: Number(product.dataset.price),
       image: product.querySelector('img')?.getAttribute('src') || '',
       quantity: 1
     };
+
     if (!isLoggedIn()) {
       localStorage.setItem(pendingProductKey, JSON.stringify(item));
       window.location.href = 'Login.html?redirect=Carrinho.html';
       return;
     }
+
     const cart = getCart();
     const existing = cart.find((entry) => entry.name === item.name);
     if (existing) existing.quantity += 1;
     else cart.push(item);
+
     saveCart(cart);
     updateCartLabel();
     button.textContent = 'Adicionado';
@@ -76,12 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
       { src: 'Assets/banner-2.png', alt: 'Cuidados e produtos para pets' },
       { src: 'Assets/banner-3.png', alt: 'Ofertas PetLife' }
     ];
+
     let current = 0;
     const showBanner = (index) => {
       current = (index + banners.length) % banners.length;
       bannerImage.src = banners[current].src;
       bannerImage.alt = banners[current].alt;
     };
+
     bannerButtons[0].addEventListener('click', () => showBanner(current - 1));
     bannerButtons[1].addEventListener('click', () => showBanner(current + 1));
     setInterval(() => showBanner(current + 1), 6000);
@@ -113,10 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const cartList = document.querySelector('[data-cart-list]');
   const cartEmpty = document.querySelector('[data-cart-empty]');
   const cartTotal = document.querySelector('[data-cart-total]');
+
   const renderCart = () => {
     if (!cartList) return;
+
     const cart = getCart();
     cartList.innerHTML = '';
+
     if (!cart.length) {
       cartEmpty.hidden = false;
       cartTotal.textContent = money(0);
@@ -124,8 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
       updateCartLabel();
       return;
     }
+
     cartEmpty.hidden = true;
     document.querySelector('[data-checkout-link]')?.classList.remove('desabilitado');
+
     cart.forEach((item, index) => {
       const row = document.createElement('article');
       row.className = 'cart-item';
@@ -139,41 +177,55 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>`;
       cartList.appendChild(row);
     });
+
     cartTotal.textContent = money(cart.reduce((sum, item) => sum + item.price * item.quantity, 0));
     updateCartLabel();
   };
+
   cartList?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-cart-action]');
     if (!button) return;
+
     const cart = getCart();
     const index = Number(button.dataset.index);
+
     if (button.dataset.cartAction === 'increase') cart[index].quantity += 1;
     if (button.dataset.cartAction === 'decrease') cart[index].quantity -= 1;
     if (button.dataset.cartAction === 'remove' || cart[index]?.quantity <= 0) cart.splice(index, 1);
+
     saveCart(cart);
     renderCart();
   });
+
   renderCart();
 
-  // O pedido é gravado no backend; pagamento online requer integração.
+  // Finalização do pedido.
   const checkoutForm = document.querySelector('[data-checkout-form]');
   checkoutForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     if (!isLoggedIn()) {
       window.location.href = 'Login.html?redirect=Finalizacao.html';
       return;
     }
     if (!getCart().length) return;
+
     const formData = Object.fromEntries(new FormData(checkoutForm).entries());
     const feedback = document.querySelector('[data-checkout-feedback]');
+
     try {
-      const response = await fetch('/api/orders', {
+      const auth = JSON.parse(localStorage.getItem(authKey) || 'null');
+      if (!auth?.token) throw new Error('Sua sessão expirou. Faça login novamente.');
+
+      const result = await apiFetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${JSON.parse(localStorage.getItem(authKey)).token}` },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`
+        },
         body: JSON.stringify({ ...formData, items: getCart() })
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Não foi possível criar o pedido.');
+
       saveCart([]);
       document.querySelector('[data-checkout-panel]').hidden = true;
       document.querySelector('[data-order-success]').hidden = false;
@@ -189,16 +241,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const petForm = document.querySelector('[data-pet-form]');
   petForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     const data = Object.fromEntries(new FormData(petForm).entries());
     const feedback = document.querySelector('[data-pet-success]');
+
     try {
-      const response = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Não foi possível criar o cadastro.');
+      const result = await apiFetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
       localStorage.removeItem(sessionKey);
       petForm.reset();
       feedback.className = 'feedback sucesso';
-      feedback.textContent = result.message;
+      feedback.textContent = result.message || 'Cadastro criado com sucesso.';
       feedback.hidden = false;
     } catch (error) {
       feedback.className = 'feedback erro';
@@ -211,14 +268,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.querySelector('[data-login-form]');
   loginForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     const data = Object.fromEntries(new FormData(loginForm).entries());
     const feedback = document.querySelector('[data-login-feedback]');
+
     try {
-      const response = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'E-mail ou senha inválidos.');
+      const result = await apiFetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
       localStorage.setItem(sessionKey, 'true');
       localStorage.setItem(authKey, JSON.stringify(result));
+
       const pendingProduct = JSON.parse(localStorage.getItem(pendingProductKey) || 'null');
       if (pendingProduct) {
         const cart = getCart();
@@ -228,8 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
         saveCart(cart);
         localStorage.removeItem(pendingProductKey);
       }
+
       feedback.className = 'feedback sucesso';
       feedback.textContent = `Login realizado. Olá, ${result.user.ownerName}!`;
+
       const redirect = new URLSearchParams(window.location.search).get('redirect');
       if (redirect) setTimeout(() => { window.location.href = redirect; }, 700);
     } catch (error) {
@@ -239,19 +304,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Agendamento.
   const bookingForm = document.querySelector('[data-booking-form]');
   bookingForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     const data = Object.fromEntries(new FormData(bookingForm).entries());
     const feedback = document.querySelector('[data-booking-success]');
+
     try {
-      const response = await fetch('/api/bookings', {
+      const result = await apiFetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Não foi possível solicitar o agendamento.');
+
       feedback.className = 'feedback sucesso';
       feedback.textContent = result.message;
       feedback.hidden = false;
@@ -263,17 +330,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.querySelectorAll('[data-toggle-password]').forEach((toggle) => toggle.addEventListener('click', () => {
-    const input = toggle.parentElement.querySelector('input');
-    input.type = input.type === 'password' ? 'text' : 'password';
-    toggle.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
-  }));
+  // Mostrar/ocultar senha.
+  document.querySelectorAll('[data-toggle-password]').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const input = toggle.parentElement.querySelector('input');
+      input.type = input.type === 'password' ? 'text' : 'password';
+      toggle.textContent = input.type === 'password' ? 'Mostrar' : 'Ocultar';
+    });
+  });
 
+  // Chat.
   const chatForm = document.querySelector('[data-chat-form]');
   const chatMessages = document.querySelector('[data-chat-messages]');
   const chatEmpty = document.querySelector('[data-chat-empty]');
   const chatFeedback = document.querySelector('[data-chat-feedback]');
   const chatHistory = [];
+
   const appendMessage = (role, text, loading = false) => {
     if (chatEmpty) chatEmpty.hidden = true;
     const bubble = document.createElement('div');
@@ -283,35 +355,43 @@ document.addEventListener('DOMContentLoaded', () => {
     chatMessages?.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
     return bubble;
   };
+
   chatForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+
     const input = chatForm.elements.message;
     const message = input.value.trim();
     if (!message) return;
+
     input.value = '';
     chatFeedback.hidden = true;
     appendMessage('user', message);
     const loading = appendMessage('assistant', 'Consultando o assistente…', true);
     chatForm.querySelector('button').disabled = true;
+
     try {
-      const response = await fetch('/api/chat', {
+      const result = await apiFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message, history: chatHistory })
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Não foi possível responder agora.');
+
       loading.remove();
       appendMessage('assistant', result.answer);
-      chatHistory.push({ role: 'user', content: message }, { role: 'assistant', content: result.answer });
+      chatHistory.push(
+        { role: 'user', content: message },
+        { role: 'assistant', content: result.answer }
+      );
     } catch (error) {
       loading.remove();
       chatFeedback.textContent = error.message;
       chatFeedback.hidden = false;
     }
+
     chatForm.querySelector('button').disabled = false;
     input.focus();
   });
+
   document.querySelector('[data-chat-clear]')?.addEventListener('click', () => {
     chatMessages.innerHTML = '';
     chatMessages.appendChild(chatEmpty);
